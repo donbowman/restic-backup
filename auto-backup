@@ -5,12 +5,13 @@ RESTIC_BACKUP_DIR=${RESTIC_BACKUP_DIR:-/var/backups}
 RESTIC_HOSTNAME=${RESTIC_HOSTNAME:-$(hostname)}
 unset TERM
 
-exec < /dev/null
-
 echo "args: <<$*>>"
 
 if [ "$1" = "auto" ]
 then
+    # This will fail on subsequent runs, but that is ok
+    /usr/bin/restic init >/dev/null 2>&1
+
     echo "Will automatically backup $RESTIC_BACKUP_DIR to $RESTIC_REPOSITORY every $RESTIC_INTERVAL hours"
     mkdir -p /var/spool/cron/crontabs /etc/crontabs
 
