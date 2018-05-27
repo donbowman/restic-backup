@@ -1,0 +1,24 @@
+#!/bin/sh
+
+RESTIC_INTERVAL=${RESTIC_INTERVAL:-4}
+RESTIC_BACKUP_DIR=${RESTIC_BACKUP_DIR:-/var/backups}
+RESTIC_HOSTNAME=${RESTIC_HOSTNAME:-$(hostname)}
+unset TERM
+
+exec < /dev/null
+
+echo "args: <<$*>>"
+
+if [ "$1" = "auto" ]
+then
+    echo "Will automatically backup $RESTIC_BACKUP_DIR to $RESTIC_REPOSITORY every $RESTIC_INTERVAL hours"
+    mkdir -p /var/spool/cron/crontabs /etc/crontabs
+
+    # minute hour day-of-month month day-of-week command
+    echo "$((RANDOM % 60)) */$RESTIC_INTERVAL * * * /usr/bin/restic backup --cleanup-cache -q --hostname=$RESTIC_HOSTNAME $RESTIC_BACKUP_DIR" > /etc/crontabs/root
+#    echo "*/1 * * * * /usr/bin/restic backup --hostname=$RESTIC_HOSTNAME $RESTIC_BACKUP_DIR < /dev/null >/dev/null 2>/dev/null" > /etc/crontabs/root
+    ln -sf /etc/crontabs/root /var/spool/cron/crontabs/root
+    exec /bin/crond -f -d 6
+else
+    exec /usr/bin/restic "$@"
+fi
