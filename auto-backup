@@ -16,7 +16,7 @@ then
     mkdir -p /var/spool/cron/crontabs /etc/crontabs
 
     # minute hour day-of-month month day-of-week command
-    echo "$((RANDOM % 60)) */$RESTIC_INTERVAL * * * /usr/bin/restic backup --cleanup-cache -q --hostname=$RESTIC_HOSTNAME $RESTIC_BACKUP_DIR" > /etc/crontabs/root
+    echo "$((RANDOM % 60)) */$RESTIC_INTERVAL * * * /usr/bin/restic backup --cleanup-cache -q --hostname=$RESTIC_HOSTNAME $RESTIC_BACKUP_DIR < /dev/null >/dev/null 2>/dev/null" > /etc/crontabs/root
 #    echo "*/1 * * * * /usr/bin/restic backup --hostname=$RESTIC_HOSTNAME $RESTIC_BACKUP_DIR < /dev/null >/dev/null 2>/dev/null" > /etc/crontabs/root
     ln -sf /etc/crontabs/root /var/spool/cron/crontabs/root
     exec /bin/crond -f -d 6
